@@ -9,10 +9,12 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "jest": "15.1.1",
     "body-parser": "^1.13.3",
     "express": "^4.13.3",
-    "mongodb": "^2.1.6"
+    "file-stream-rotator": "0.0.7",
+    "jest": "15.1.1",
+    "mongodb": "^2.1.6",
+    "morgan": "^1.7.0"
   },
   "repository": {}
 }

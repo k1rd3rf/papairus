@@ -39,3 +39,5 @@ jspm_packages
 # IntelliJ
 .idea/
 *.iml
+
+logs/
