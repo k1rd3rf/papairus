@@ -133,5 +133,6 @@ function getNewMember(body, res) {
 
   newMember.name = body.name || body.userId;
   newMember.startDate = moment(body.startDate).toDate();
+  console.log("Got new member", newMember);
   return newMember;
 }
