@@ -2,9 +2,6 @@
 
 var express = require("express");
 var bodyParser = require("body-parser");
-var FileStreamRotator = require('file-stream-rotator');
-var fs = require('fs');
-var path = require('path');
 var mongodb = require("mongodb");
 var morgan = require("morgan");
 var ObjectID = mongodb.ObjectID;
@@ -15,18 +12,7 @@ var app = express();
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
 
-var logDirectory = path.join(__dirname, 'logs');
-
-fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
-
-app.use(morgan('combined', {
-  stream: FileStreamRotator.getStream({
-    date_format: 'YYYYMMDD',
-    filename: path.join(logDirectory, 'access-%DATE%.log'),
-    frequency: 'daily',
-    verbose: false
-  })
-}));
+app.use(morgan('combined'));
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
