@@ -4,6 +4,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var morgan = require("morgan");
+var moment = require("moment");
 var ObjectID = mongodb.ObjectID;
 
 var MEMBER_COLLECTION = "members";
@@ -131,6 +132,6 @@ function getNewMember(body, res) {
   }
 
   newMember.name = body.name || body.userId;
-  newMember.startDate = new Date(body.startDate) || new Date();
+  newMember.startDate = moment(body.startDate).toDate();
   return newMember;
 }
