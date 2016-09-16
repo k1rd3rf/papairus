@@ -5,6 +5,7 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 
 var PAIRS_COLLECTION = "pairs";
+var MEMBER_COLLECTION = "members";
 
 var app = express();
 app.use(express.static(__dirname + "/public"));
@@ -44,23 +45,51 @@ function handleError(res, reason, message, code) {
  *    POST: creates a new contact
  */
 
-app.get("/contacts", function (req, res) {
+var baseUrl = "/members";
+app.get(baseUrl, function (req, res) {
 });
 
-app.post("/contacts", function (req, res) {
+app.post(baseUrl, function (req, res) {
+  db.collection(MEMBER_COLLECTION).insertOne(getNewMember(req.body || {}), function (err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to create new member.");
+    } else {
+      res.status(201).json(doc.ops[0]);
+    }
+  });
 });
 
-/*  "/contacts/:id"
- *    GET: find contact by id
- *    PUT: update contact by id
- *    DELETE: deletes contact by id
+/**
+ *  "/members/:id"
+ *    GET: find member by id
+ *    PUT: update member by id
+ *    DELETE: deletes member by id
  */
-
-app.get("/contacts/:id", function (req, res) {
+app.get(baseUrl + "/:id", function (req, res) {
 });
 
-app.put("/contacts/:id", function (req, res) {
+app.put(baseUrl + "/:id", function (req, res) {
 });
 
-app.delete("/contacts/:id", function (req, res) {
+app.delete(baseUrl + "/:id", function (req, res) {
 });
+
+/**
+ * Validates and creates a new member
+ * @param input {{userId: String, name: String, startDate: Date}}
+ * @returns {{createdDate: Date, userId: String, name: String, startDate: Date}}
+ */
+function getNewMember(input) {
+  var newMember = {};
+
+  newMember.createDate = new Date();
+  newMember.userId = input.userId;
+
+  if (!(input.userId && input.userId.length === 7)) {
+    handleError(res, "Invalid user input", "Must provide a userId with 7 characters.", 400);
+  }
+
+  newMember.name = input.name || input.userId;
+  newMember.startDate = input.startDate || new Date();
+  return newMember;
+}
