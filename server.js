@@ -131,6 +131,6 @@ function getNewMember(body, res) {
   }
 
   newMember.name = body.name || body.userId;
-  newMember.startDate = body.startDate || new Date();
+  newMember.startDate = new Date(body.startDate) || new Date();
   return newMember;
 }
