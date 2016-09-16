@@ -123,7 +123,7 @@ function getNewMember(body, res) {
   newMember.userId = body.userId;
 
   if (!(body.userId && body.userId.length === 7)) {
-    handleError(res, "Invalid user input", "Must provide a userId with 7 characters.", 400);
+    handleError(res, "Invalid user input", "userId: '" + body.userId + "' is invalid. Must provide a userId with 7 characters.", 400);
   }
 
   newMember.name = body.name || body.userId;
