@@ -66,12 +66,17 @@ app.get(baseUrl, function (req, res) {
 });
 
 app.post(baseUrl, function (req, res) {
-  console.log("POST:", req);
-  db.collection(MEMBER_COLLECTION).insertOne(getNewMember(req.body || {}, res), function (err, doc) {
+  getNewMember(req.body || {}, function (err, newMember) {
     if (err) {
-      handleError(res, err.message, "Failed to create new member.");
+      handleError(res, err.reason, err.message, err.code);
     } else {
-      res.status(201).json(doc.ops[0]);
+      db.collection(MEMBER_COLLECTION).insertOne(newMember, function (err, doc) {
+        if (err) {
+          handleError(res, err.message, "Failed to create new member.");
+        } else {
+          res.status(201).json(doc.ops[0]);
+        }
+      })
     }
   });
 });
@@ -118,21 +123,26 @@ app.delete(baseUrl + "/:id", function (req, res) {
 /**
  * Validates and creates a new member
  * @param body {{userId: String, name: String, startDate: Date}}
- * @param res result
+ * @param {Function} callback
  * @returns {{createdDate: Date, userId: String, name: String, startDate: Date}}
  */
-function getNewMember(body, res) {
+function getNewMember(body, callback) {
   var newMember = {};
+  var err = null;
 
   newMember.createDate = new Date();
   newMember.userId = body.userId;
 
   if (!(body.userId && body.userId.length === 7)) {
-    handleError(res, "Invalid user input", "userId: '" + body.userId + "' is invalid. Must provide a userId with 7 characters.", 400);
+    err = {
+      reason: "Invalid user input",
+      message: "userId: '" + body.userId + "' is invalid. Must provide a userId with 7 characters.",
+      code: 400
+    };
   }
 
   newMember.name = body.name || body.userId;
   newMember.startDate = moment(body.startDate).toDate();
-  console.log("Got new member", newMember);
-  return newMember;
+
+  return callback(err, newMember);
 }
