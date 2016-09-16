@@ -14,7 +14,8 @@
     "jest": "15.1.1",
     "moment": "^2.15.0",
     "mongodb": "^2.1.6",
-    "morgan": "^1.7.0"
+    "morgan": "^1.7.0",
+    "regex": "0.1.1"
   },
   "repository": {}
 }
