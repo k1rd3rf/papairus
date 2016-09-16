@@ -30,7 +30,7 @@
   "repository": {},
   "scripts": {
     "test": "jest",
-    "start": "DEBUG=papairus:* babel-node src/server/index.js",
+    "start": "DEBUG=* babel-node src/server/index.js",
     "lint": "eslint --ignore-path .gitignore . --fix"
   }
 }
