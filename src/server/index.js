@@ -1,10 +1,11 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const mongodb = require('mongodb');
-const morgan = require('morgan');
-const moment = require('moment');
-const validator = require('./validator');
+import express from 'express';
+import path from 'path';
+import * as bodyParser from 'body-parser';
+import mongodb from 'mongodb';
+import morgan from 'morgan';
+import moment from 'moment';
+import debug from 'debug';
+import { validateUserId } from './validator';
 
 const MEMBER_COLLECTION = 'members';
 const ObjectID = mongodb.ObjectID;
@@ -15,30 +16,35 @@ app.use(bodyParser.json());
 app.use(morgan('combined'));
 
 let db;
+const log = debug('papairus:app');
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI, (err, database) => {
+const dbUrl = process.env.MONGODB_URI;
+
+if (!dbUrl) {
+  log('MONGODB_URI not set.');
+  process.exit(1);
+}
+
+mongodb.MongoClient.connect(dbUrl, (err, database) => {
   if (err) {
-    console.log(err);
+    log(err);
     process.exit(1);
   }
 
   // Save database object from the callback for reuse.
   db = database;
-  console.log('Database connection ready');
+  log('Database connection ready');
 
   // Initialize the app.
   const server = app.listen(process.env.PORT || 8080, () => {
     const port = server.address().port;
-    console.log('App now running on port', port);
+    log('App now running on port %s', port);
   });
 });
 
-// CONTACTS API ROUTES BELOW
-
-// Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
-  console.log(`ERROR: ${reason}`, message);
+  log(`ERROR: ${reason}. %s`, message);
   res.status(code || 500).json({ error: message, reason });
 }
 
@@ -55,10 +61,12 @@ function getNewMember(body, callback) {
   newMember.userId = body.userId;
 
 
-  if (!(body.userId && body.userId.length === 7 && validator.validateUserId(body.userId))) {
+  if (!(body.userId && body.userId.length === 7 && validateUserId(body.userId))) {
+    const desc = 'Must provide a userId with 7 characters that starts with either ' +
+      'AC or CC and is followed by 5 digits (example: AC12345).';
     err = {
       reason: 'Invalid user input',
-      message: `userId: '${body.userId}' is invalid. Must provide a userId with 7 characters that starts with either AC or CC and is followed by 5 digits (example: AC12345).`,
+      message: `userId: '${body.userId}' is invalid. ${desc}`,
       code: 400
     };
   }
@@ -69,13 +77,14 @@ function getNewMember(body, callback) {
   return callback(err, newMember);
 }
 
-/*  "/contacts"
- *    GET: finds all contacts
- *    POST: creates a new contact
- */
 
 const baseUrl = '/members';
 
+/**
+ *  "/members"
+ *    GET: finds all contacts
+ *    POST: creates a new contact
+ */
 app.get(baseUrl, (req, res) => {
   db.collection(MEMBER_COLLECTION).find({}).toArray((err, docs) => {
     if (err) {
@@ -108,7 +117,7 @@ app.post(baseUrl, (req, res) => {
  *    PUT: update member by id
  *    DELETE: deletes member by id
  */
-app.get(baseUrl + '/:id', (req, res) => {
+app.get(`${baseUrl}/:id`, (req, res) => {
   db.collection(MEMBER_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, (err, doc) => {
     if (err) {
       handleError(res, err.message, 'Failed to get member');
@@ -118,11 +127,12 @@ app.get(baseUrl + '/:id', (req, res) => {
   });
 });
 
-app.put(baseUrl + '/:id', (req, res) => {
+app.put(`${baseUrl}/:id`, (req, res) => {
   const updateDoc = req.body;
   delete updateDoc._id;
+  const objectID = new ObjectID(req.params.id);
 
-  db.collection(MEMBER_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, updateDoc, (err) => {
+  db.collection(MEMBER_COLLECTION).updateOne({ _id: objectID }, updateDoc, (err) => {
     if (err) {
       handleError(res, err.message, 'Failed to update member.');
     } else {
@@ -131,7 +141,7 @@ app.put(baseUrl + '/:id', (req, res) => {
   });
 });
 
-app.delete(baseUrl + '/:id', (req, res) => {
+app.delete(`${baseUrl}/:id`, (req, res) => {
   db.collection(MEMBER_COLLECTION).deleteOne({ _id: new ObjectID(req.params.id) }, (err) => {
     if (err) {
       handleError(res, err.message, 'Failed to delete member.');

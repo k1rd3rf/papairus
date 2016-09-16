@@ -24,12 +24,13 @@
     "moment": "^2.15.0",
     "mongodb": "^2.1.6",
     "morgan": "^1.7.0",
-    "regexp": "1.0.0"
+    "regexp": "1.0.0",
+    "debug": "latest"
   },
   "repository": {},
   "scripts": {
     "test": "jest",
-    "start": "babel-node src/server/index.js",
+    "start": "DEBUG=papairus:* babel-node src/server/index.js",
     "lint": "eslint --ignore-path .gitignore . --fix"
   }
 }
