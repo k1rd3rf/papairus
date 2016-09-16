@@ -45,8 +45,20 @@ function handleError(res, reason, message, code) {
  *    POST: creates a new contact
  */
 
+app.get("/status", function (req, res) {
+  res.status(200).json({"up": true})
+});
+
 var baseUrl = "/members";
+
 app.get(baseUrl, function (req, res) {
+  db.collection(MEMBER_COLLECTION).find({}).toArray(function (err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get members.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
 });
 
 app.post(baseUrl, function (req, res) {
@@ -66,12 +78,36 @@ app.post(baseUrl, function (req, res) {
  *    DELETE: deletes member by id
  */
 app.get(baseUrl + "/:id", function (req, res) {
+  db.collection(MEMBER_COLLECTION).findOne({_id: new ObjectID(req.params.id)}, function (err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to get member");
+    } else {
+      res.status(200).json(doc);
+    }
+  });
 });
 
 app.put(baseUrl + "/:id", function (req, res) {
+  var updateDoc = req.body;
+  delete updateDoc._id;
+
+  db.collection(MEMBER_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function (err) {
+    if (err) {
+      handleError(res, err.message, "Failed to update member.");
+    } else {
+      res.status(204).end();
+    }
+  });
 });
 
 app.delete(baseUrl + "/:id", function (req, res) {
+  db.collection(MEMBER_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function (err) {
+    if (err) {
+      handleError(res, err.message, "Failed to delete member.");
+    } else {
+      res.status(204).end();
+    }
+  });
 });
 
 /**
