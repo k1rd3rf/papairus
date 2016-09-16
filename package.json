@@ -5,21 +5,31 @@
   "main": "server.js",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^15.1.1",
-    "jest-cli": "^15.1.1"
-  },
-  "scripts": {
-    "test": "jest",
-    "start": "node server.js"
+    "babel-eslint": "^6.1.2",
+    "babel-jest": "^15.0.0",
+    "eslint": "^3.5.0",
+    "eslint-config-airbnb": "^11.1.0",
+    "eslint-plugin-import": "^1.15.0",
+    "eslint-plugin-jasmine": "^1.8.1",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-react": "^6.2.2",
+    "jest": "^15.1.1"
   },
   "dependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
     "body-parser": "^1.13.3",
     "express": "^4.13.3",
-    "jest": "15.1.1",
     "moment": "^2.15.0",
     "mongodb": "^2.1.6",
     "morgan": "^1.7.0",
     "regexp": "1.0.0"
   },
-  "repository": {}
+  "repository": {},
+  "scripts": {
+    "test": "jest",
+    "start": "babel-node src/server/index.js",
+    "lint": "eslint --ignore-path .gitignore . --fix"
+  }
 }
