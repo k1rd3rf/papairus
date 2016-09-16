@@ -10,9 +10,6 @@ var ObjectID = mongodb.ObjectID;
 
 var MEMBER_COLLECTION = "members";
 
-var idRegex = "^[a|A|c|C][c|C]\d{5}$"
-
-
 var app = express();
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
@@ -133,7 +130,7 @@ app.delete(baseUrl + "/:id", function (req, res) {
 function getNewMember(body, callback) {
   var newMember = {};
   var err = null;
-  var regex = new Regex(idRegex)
+  var regex = new Regex(^[a|A|c|C][c|C]\d{5}$)
   newMember.createDate = new Date();
   newMember.userId = body.userId;
 
