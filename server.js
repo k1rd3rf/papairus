@@ -130,11 +130,12 @@ app.delete(baseUrl + "/:id", function (req, res) {
 function getNewMember(body, callback) {
   var newMember = {};
   var err = null;
-  var regex = new Regex(^[a|A|c|C][c|C]\d{5}$)
+  //var regex = new Regex(^[a|A|c|C][c|C]\d{5}$)
+  //&& regex.test(body.userId)
   newMember.createDate = new Date();
   newMember.userId = body.userId;
 
-  if (!(body.userId && body.userId.length === 7 && regex.test(body.userId))) {
+  if (!(body.userId && body.userId.length === 7 )) {
     err = {
       reason: "Invalid user input",
       message: "userId: '" + body.userId + "' is invalid. Must provide a userId with 7 characters that starts with either AC or CC and is followed by 5 digits (example: AC12345).",
