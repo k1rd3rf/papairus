@@ -4,6 +4,10 @@
   "description": "A simple app that enables our team to select programming pairs",
   "main": "server.js",
   "license": "MIT",
+  "devDependencies": {
+    "jest": "^15.1.1",
+    "jest-cli": "^15.1.1"
+  },
   "scripts": {
     "test": "jest",
     "start": "node server.js"
@@ -15,7 +19,7 @@
     "moment": "^2.15.0",
     "mongodb": "^2.1.6",
     "morgan": "^1.7.0",
-    "regex": "0.1.1"
+    "regexp": "1.0.0"
   },
   "repository": {}
 }
