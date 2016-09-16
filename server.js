@@ -9,7 +9,6 @@ var Regex = require("regex");
 var ObjectID = mongodb.ObjectID;
 
 var MEMBER_COLLECTION = "members";
-var idRegex = new Regex(/^[a|A|c|C][c|C]\d{5}$/);
 var app = express();
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
@@ -133,7 +132,7 @@ function getNewMember(body, callback) {
   newMember.createDate = new Date();
   newMember.userId = body.userId;
 
-  if (!(body.userId && body.userId.length === 7 && idRegex.test(body.userId))) {
+  if (!(body.userId && body.userId.length === 7)) {
     err = {
       reason: "Invalid user input",
       message: "userId: '" + body.userId + "' is invalid. Must provide a userId with 7 characters that starts with either AC or CC and is followed by 5 digits (example: AC12345).",
