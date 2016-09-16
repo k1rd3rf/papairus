@@ -1,0 +1,8 @@
+{
+  "name": "Papairus",
+  "description": "A simple app that enables our team to select programming pairs",
+  "repository": "https://github.com/k1rd3rf/papairus",
+  "logo": "https://raw.githubusercontent.com/k1rd3rf/papairus/master/public/logo.png",
+  "keywords": ["node", "express", "angular", "MEAN", "mongodb", "REST", "API"],
+  "addons": ["mongolab"]
+}
