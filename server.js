@@ -7,6 +7,8 @@ var morgan = require("morgan");
 var moment = require("moment");
 var ObjectID = mongodb.ObjectID;
 
+var validator = require("./validator.js");
+
 var MEMBER_COLLECTION = "members";
 var app = express();
 app.use(express.static(__dirname + "/public"));
@@ -132,7 +134,7 @@ function getNewMember(body, callback) {
   newMember.userId = body.userId;
 
 
-  if (!(body.userId && body.userId.length === 7 && validateUserId(body.userId))) {
+  if (!(body.userId && body.userId.length === 7 && validator.validateUserId(body.userId))) {
     err = {
       reason: "Invalid user input",
       message: "userId: '" + body.userId + "' is invalid. Must provide a userId with 7 characters that starts with either AC or CC and is followed by 5 digits (example: AC12345).",
