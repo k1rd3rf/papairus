@@ -65,7 +65,7 @@ app.get(baseUrl, function (req, res) {
 });
 
 app.post(baseUrl, function (req, res) {
-  console.debug("POST:", req);
+  console.log("POST:", req);
   db.collection(MEMBER_COLLECTION).insertOne(getNewMember(req.body || {}, res), function (err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to create new member.");
