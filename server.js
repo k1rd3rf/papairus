@@ -1,10 +1,10 @@
+"use strict";
+
 var express = require("express");
-var path = require("path");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 
-var PAIRS_COLLECTION = "pairs";
 var MEMBER_COLLECTION = "members";
 
 var app = express();
@@ -62,7 +62,7 @@ app.get(baseUrl, function (req, res) {
 });
 
 app.post(baseUrl, function (req, res) {
-  db.collection(MEMBER_COLLECTION).insertOne(getNewMember(req.body || {}), function (err, doc) {
+  db.collection(MEMBER_COLLECTION).insertOne(getNewMember(req.body || {}, res), function (err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to create new member.");
     } else {
@@ -112,20 +112,21 @@ app.delete(baseUrl + "/:id", function (req, res) {
 
 /**
  * Validates and creates a new member
- * @param input {{userId: String, name: String, startDate: Date}}
+ * @param body {{userId: String, name: String, startDate: Date}}
+ * @param res result
  * @returns {{createdDate: Date, userId: String, name: String, startDate: Date}}
  */
-function getNewMember(input) {
+function getNewMember(body, res) {
   var newMember = {};
 
   newMember.createDate = new Date();
-  newMember.userId = input.userId;
+  newMember.userId = body.userId;
 
-  if (!(input.userId && input.userId.length === 7)) {
+  if (!(body.userId && body.userId.length === 7)) {
     handleError(res, "Invalid user input", "Must provide a userId with 7 characters.", 400);
   }
 
-  newMember.name = input.name || input.userId;
-  newMember.startDate = input.startDate || new Date();
+  newMember.name = body.name || body.userId;
+  newMember.startDate = body.startDate || new Date();
   return newMember;
 }
