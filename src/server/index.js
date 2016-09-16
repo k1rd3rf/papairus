@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import * as bodyParser from 'body-parser';
 import mongodb from 'mongodb';
-import morgan from 'morgan';
+import morgan from 'morgan-debug';
 import moment from 'moment';
 import debug from 'debug';
 import { validateUserId } from './validator';
@@ -13,7 +13,7 @@ const app = express();
 
 app.use(express.static(path.join('/public')));
 app.use(bodyParser.json());
-app.use(morgan('combined'));
+app.use(morgan('papairus', 'combined'));
 
 let db;
 const log = debug('papairus:app');
