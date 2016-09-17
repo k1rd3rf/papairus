@@ -13,7 +13,8 @@
     "eslint-plugin-jasmine": "^1.8.1",
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.2.2",
-    "jest": "^15.1.1"
+    "jest": "^15.1.1",
+    "nodemon": "^1.10.2"
   },
   "dependencies": {
     "babel": "^6.5.2",
@@ -24,14 +25,13 @@
     "express": "^4.13.3",
     "moment": "^2.15.0",
     "mongodb": "^2.1.6",
-    "morgan": "^1.7.0",
-    "morgan-debug": "^1.0.0",
-    "regexp": "1.0.0"
+    "morgan": "^1.7.0"
   },
   "repository": {},
   "scripts": {
     "test": "jest",
-    "start": "DEBUG=* babel-node src/server/index.js",
+    "watch": "nodemon --exec npm run start",
+    "start": "DEBUG=papairus* babel-node src/server/index.js",
     "lint": "eslint --ignore-path .gitignore . --fix"
   }
 }

@@ -5,16 +5,17 @@ const log = debug('papairus:db:mongo');
 
 let db;
 
-// Connect to the database before starting the application server.
 const dbUrl = process.env.MONGODB_URI;
 
-if (!dbUrl) {
-  log('MONGODB_URI not set.');
-  process.exit(1);
-}
-
 export function getDatabase(callback) {
+  if (!dbUrl) {
+    const error = 'MONGODB_URI not set.';
+    log(error);
+    callback({ message: error }, null);
+  }
+
   if (!db) {
+    log('Initializing database connection');
     mongodb.MongoClient.connect(dbUrl, (err, database) => {
       if (err) {
         log(err);
@@ -26,6 +27,10 @@ export function getDatabase(callback) {
   } else {
     callback(null, db);
   }
+}
+
+export function getId(req) {
+  return { _id: new mongodb.ObjectID(req.params.id) };
 }
 
 export default { getDatabase };
