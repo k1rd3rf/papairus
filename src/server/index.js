@@ -6,6 +6,7 @@ import morgan from 'morgan-debug';
 import moment from 'moment';
 import debug from 'debug';
 import { validateUserId } from './validator';
+import { getDatabase } from './db/mongo';
 
 const MEMBER_COLLECTION = 'members';
 const ObjectID = mongodb.ObjectID;
@@ -15,33 +16,22 @@ app.use(express.static(path.join('/public')));
 app.use(bodyParser.json());
 app.use(morgan('papairus', 'combined'));
 
-let db;
 const log = debug('papairus:app');
+let db;
 
-// Connect to the database before starting the application server.
-const dbUrl = process.env.MONGODB_URI;
-
-if (!dbUrl) {
-  log('MONGODB_URI not set.');
-  process.exit(1);
-}
-
-mongodb.MongoClient.connect(dbUrl, (err, database) => {
+getDatabase((err, database) => {
   if (err) {
-    log(err);
     process.exit(1);
   }
 
-  // Save database object from the callback for reuse.
   db = database;
-  log('Database connection ready');
 
-  // Initialize the app.
   const server = app.listen(process.env.PORT || 8080, () => {
     const port = server.address().port;
     log('App now running on port %s', port);
   });
 });
+
 
 function handleError(res, reason, message, code) {
   log(`ERROR: ${reason}. %s`, message);
