@@ -24,16 +24,16 @@ export function create(req, res, next) {
     })
     .then(member => res.json(member))
     .catch(next);
-        }
+}
 
 function getMember(userId) {
   return Member.findOne({ userId: { $regex: `^${userId}$`, $options: 'i' } })
     .then((member) => {
       if (member) {
         return member;
-    }
+      }
       throw new NotFoundError(`member, ${userId}`);
-  });
+    });
 }
 
 export function show(req, res, next) {
