@@ -2,20 +2,21 @@ import express from 'express';
 import * as bodyParser from 'body-parser';
 import morgan from 'morgan';
 import debug from 'debug';
-import { getDatabase } from './db/mongo';
+import { initDatabase } from './db/mongo';
 import routes from './api/routes';
 
 const app = express();
 const log = debug('papairus:app');
+const error = debug('papairus:app:error');
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(morgan('combined'));
 app.use('/api', routes);
 
-getDatabase((err) => {
+initDatabase((err) => {
   if (err) {
-    log('Unable to start application without database.');
+    error('Unable to start application without database.');
     process.exit(1);
   }
 

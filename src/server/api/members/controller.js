@@ -1,21 +1,5 @@
-import debug from 'debug';
-import { getDatabase, getId } from '../../db/mongo';
-import { handleError } from '../error';
-import { getNewMember } from './member';
-
-const log = debug('papairus:members:controller');
-
-const collection = 'members';
-
-let db;
-
-getDatabase((err, database) => {
-  if (err) {
-    log('Need database in order to use members API.');
-    process.exit(1);
-  }
-  db = database;
-});
+import Member from './member.model';
+import { NotFoundError, ValidationError } from '../../error';
 
 /**
  * Returns a list of all the members
@@ -24,65 +8,57 @@ getDatabase((err, database) => {
  * @param next
  */
 export function list(req, res, next) {
-  db.collection(collection).find({}).toArray((err, docs) => {
-    if (err) {
-      handleError(res, err.message, 'Failed to get members.');
-    } else {
-      res.status(200).json(docs);
-    }
-    next();
-  });
+  Member.find()
+    .then(members => res.json(members))
+    .catch(next);
 }
 
 export function create(req, res, next) {
-  getNewMember(req.body || {}, (err, newMember) => {
-    if (err) {
-      handleError(res, err.reason, err.message, err.code);
-      next();
-    } else {
-      db.collection(collection).insertOne(newMember, (dbErr, doc) => {
-        if (dbErr) {
-          handleError(res, dbErr.message, 'Failed to create new member.');
-        } else {
-          res.status(201).json(doc.ops[0]);
+  Member({
+    userId: req.body.userId,
+    startedDate: req.body.startedDate,
+    name: req.body.name
+  }).save()
+    .catch((err) => {
+      throw new ValidationError(err.message);
+    })
+    .then(member => res.json(member))
+    .catch(next);
         }
-        next();
-      });
+
+function getMember(userId) {
+  return Member.findOne({ userId: { $regex: `^${userId}$`, $options: 'i' } })
+    .then((member) => {
+      if (member) {
+        return member;
     }
+      throw new NotFoundError(`member, ${userId}`);
   });
 }
 
 export function show(req, res, next) {
-  db.collection(collection).findOne(getId(req), (err, doc) => {
-    if (err) {
-      handleError(res, err.message, 'Failed to get member');
-    } else {
-      res.status(200).json(doc);
-    }
-    next();
-  });
+  const userId = req.params.id;
+  getMember(userId)
+    .then(member => res.json(member))
+    .catch(next);
 }
 
 export function update(req, res, next) {
-  const updateDoc = req.body;
-  delete updateDoc._id;
-  db.collection(collection).updateOne(getId(req), updateDoc, (err) => {
-    if (err) {
-      handleError(res, err.message, 'Failed to update member.');
-    } else {
-      res.status(204).end();
-    }
-    next();
-  });
+  const userId = req.params.id;
+  getMember(userId)
+    .then(member => Member(Object.assign(member, req.body)))
+    .then(member => member.save())
+    .catch((err) => {
+      throw new ValidationError(err.message);
+    })
+    .then(member => res.json(member))
+    .catch(next);
 }
 
 export function destroy(req, res, next) {
-  db.collection(collection).deleteOne(getId(req), (err) => {
-    if (err) {
-      handleError(res, err.message, 'Failed to delete member.');
-    } else {
-      res.status(204).end();
-    }
-    next();
-  });
+  const userId = req.params.id;
+  getMember(userId)
+    .then(member => member.remove())
+    .then(res.status(204).end())
+    .catch(next);
 }
