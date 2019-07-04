@@ -27,13 +27,17 @@
     "moment": "^2.15.0",
     "mongodb": "^2.1.6",
     "mongoose": "^4.6.0",
-    "morgan": "^1.7.0"
+    "morgan": "^1.7.0",
+    "snyk": "^1.189.0"
   },
   "repository": {},
   "scripts": {
     "test": "jest",
     "watch": "nodemon --exec npm run start",
     "start": "DEBUG=papairus* babel-node src/server/index.js",
-    "lint": "eslint --ignore-path .gitignore . --fix"
-  }
+    "lint": "eslint --ignore-path .gitignore . --fix",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
